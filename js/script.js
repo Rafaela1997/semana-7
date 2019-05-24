@@ -1,47 +1,78 @@
-const nomePessoa = document.getElementById("nome")
+
+const container = document.querySelector('.maravilhosas__box');
 
 
-    const app = document.getElementById('root');
-    const quadro=document.getElementById("container")
-    const container = document.createElement('div');
-    container.setAttribute('class', 'container');
+fetch(`https://theblackwomanhistory.firebaseio.com/.json`)
+    .then((response) => {
+        return response.json();
+    })
+    .then((data) => {
+        console.log(data)
+        data.content.forEach(mulheres => {
 
-    // const foto = document.getElementById("foto").value
-    // console.log(foto)
-    //const img = document.getElementById("img").value
-
-    fetch(`https://theblackwomanhistory.firebaseio.com/.json`)
-        .then((response) => {
-            return response.json();
-        })
-        .then((data) => {
-            console.log(data)
-            data.content.forEach(mulheres => {
             const card = document.createElement('div');
-            card.setAttribute('class', 'box');
-            container.setAttribute("class","nome")
+            card.setAttribute('class', 'maravilhosas__perfil');
             container.appendChild(card);
-            console.log(data.content,"contet")
-            
-         let image = document.createElement('img');
-          image.src = mulheres.content.image.url
-         console.log( mulheres.content.image.url)
 
-        let titulo = document.createElement("h1");
-         titulo.textContent = mulheres.content.title;
-         console.log(titulo,"titulo")
-         
+            let ancora = document.createElement('a');
+            ancora.setAttribute('href', '#');
+            card.appendChild(ancora);
+
+            let img = document.createElement('img');
+            img.setAttribute('class', 'img-responsive');
+
+            if (mulheres.metadata && mulheres.metadata.image) {
+                img.setAttribute('src', mulheres.metadata.image.url) 
+             } else {
+                        img.setAttribute('src', './img/img-mulher.png');
+                }
+
+            let titulo = document.createElement("h1");
+            titulo.textContent = mulheres.title;
+
+            ancora.appendChild(titulo);
+            card.appendChild(img)
+
+        })
+    })
+    .catch((erro) => {
+        console.log(erro)
+    })
+
+
+    const button = document.getElementById("botao");
+
+button.addEventListener("click", (evento) => {
+    evento.preventDefault();
+
+    const nome = document.getElementById("name").value;
+    const imagem = document.getElementById("img").value;
+
+    fetch('http://localhost:5001/maravilhosas/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'title': nome,
+            'metadata': {
+                'image':{
+                    'url':imagem,
+                }
+                },
+        })
         
+    })
+    .then((response) => {
+        return response.json();
+    })
+    .then((data) => {
+        console.log( "Sucesso!! :)");
+    })
+    .catch((erro) => {
+        console.log(erro)
+    })
 
 
-        card.appendChild(image)
-        card.appendChild(titulo); 
-
-        container.appendChild(card);
-        quadro.appendChild(container)
-
-            })
-        })
-        .catch((erro) => {
-            console.log(erro)
-        })
+})
