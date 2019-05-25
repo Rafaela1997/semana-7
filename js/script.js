@@ -2,7 +2,7 @@
 const container = document.querySelector('.maravilhosas__box');
 
 
-fetch(`https://theblackwomanhistory.firebaseio.com/.json`)
+fetch(`http://localhost:5001/maravilhosas/`)
     .then((response) => {
         return response.json();
     })
@@ -22,16 +22,40 @@ fetch(`https://theblackwomanhistory.firebaseio.com/.json`)
             img.setAttribute('class', 'img-responsive');
 
             if (mulheres.metadata && mulheres.metadata.image) {
-                img.setAttribute('src', mulheres.metadata.image.url) 
-             } else {
-                        img.setAttribute('src', './img/img-mulher.png');
-                }
+                img.setAttribute('src', mulheres.metadata.image.url)
+            } else {
+                img.setAttribute('src', './img/img-mulher.png');
+            }
 
             let titulo = document.createElement("h1");
             titulo.textContent = mulheres.title;
 
             ancora.appendChild(titulo);
-            card.appendChild(img)
+            card.appendChild(img);
+
+            const botao = document.createElement("button");
+            botao.textContent = "✖";
+            botao.setAttribute("data-id", mulheres.id)
+            card.appendChild(botao)
+
+            botao.addEventListener("click", () => {
+                const apagar = botao.parentElement
+                const cartao = apagar.parentElement
+
+                fetch(`http://localhost:5001/maravilhosas/${mulheres.id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(() => {
+                    cartao.removeChild(apagar)
+                })
+                .catch((erro) => {
+                    console.log(erro)
+                })
+            })
 
         })
     })
@@ -40,13 +64,13 @@ fetch(`https://theblackwomanhistory.firebaseio.com/.json`)
     })
 
 
-    const button = document.getElementById("botao");
+const button = document.querySelector(".botao");
 
 button.addEventListener("click", (evento) => {
     evento.preventDefault();
 
-    const nome = document.getElementById("name").value;
-    const imagem = document.getElementById("img").value;
+    const nome = document.querySelector(".name").value;
+    const imagem = document.querySelector(".img").value;
 
     fetch('http://localhost:5001/maravilhosas/', {
         method: 'POST',
@@ -57,22 +81,20 @@ button.addEventListener("click", (evento) => {
         body: JSON.stringify({
             'title': nome,
             'metadata': {
-                'image':{
-                    'url':imagem,
+                'image': {
+                    'url': imagem,
                 }
-                },
+            },
         })
-        
-    })
-    .then((response) => {
-        return response.json();
-    })
-    .then((data) => {
-        console.log( "Sucesso!! :)");
-    })
-    .catch((erro) => {
-        console.log(erro)
-    })
 
-
+    })
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+            console.log("Sucesso!! :)");
+        })
+        .catch((erro) => {
+            console.log(erro)
+        })
 })
